@@ -191,35 +191,55 @@ export default function Index() {
             <h2 className="font-display font-light" style={{ fontSize: "clamp(36px,5vw,56px)" }}>Состояние банка</h2>
           </div>
 
-          {/* Большие цифры */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-px mb-2" style={{ background: "#1A1A1A" }}>
-            <div className="p-12 text-center" style={{ backgroundColor: "#0D0D0D" }}>
+          {/* Большие цифры — 3 карточки */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-px mb-2" style={{ background: "#1A1A1A" }}>
+            <div className="p-10 text-center" style={{ backgroundColor: "#0D0D0D" }}>
               <p className="text-xs font-body tracking-[0.25em] uppercase mb-4" style={{ color: "#444" }}>В банке сейчас</p>
-              <p className="font-display font-semibold mb-2" style={{ fontSize: "clamp(40px,6vw,72px)", color: "#C9A84C", lineHeight: 1 }}>
+              <p className="font-display font-semibold mb-2" style={{ fontSize: "clamp(32px,4vw,56px)", color: "#C9A84C", lineHeight: 1 }}>
                 {fmt(animBank)}
               </p>
               <p className="text-xs font-body" style={{ color: "#444" }}>сумма всех взносов</p>
             </div>
-            <div className="p-12 text-center" style={{ backgroundColor: "#0D0D0D" }}>
+            <div className="p-10 text-center" style={{ backgroundColor: "#0D0D0D" }}>
               <p className="text-xs font-body tracking-[0.25em] uppercase mb-4" style={{ color: "#444" }}>Участников</p>
-              <p className="font-display font-semibold mb-2" style={{ fontSize: "clamp(40px,6vw,72px)", color: "#EDE8DF", lineHeight: 1 }}>
+              <p className="font-display font-semibold mb-2" style={{ fontSize: "clamp(32px,4vw,56px)", color: "#EDE8DF", lineHeight: 1 }}>
                 {animCount}
               </p>
               <p className="text-xs font-body" style={{ color: "#444" }}>активных договоров</p>
             </div>
-          </div>
-
-          {/* Взнос одного участника */}
-          <div className="p-6 mb-8 flex flex-col md:flex-row items-center justify-between gap-4" style={{ backgroundColor: "#111", border: "1px solid #1A1A1A" }}>
-            <div className="flex items-center gap-3">
-              <Icon name="Info" size={15} style={{ color: "#8A6F30", flexShrink: 0 }} />
-              <p className="text-sm font-body" style={{ color: "#666" }}>
-                Взнос каждого участника: <span style={{ color: "#EDE8DF" }}>12 000 ₽</span> или <span style={{ color: "#EDE8DF" }}>1 000 ₽/мес</span>
+            <div className="p-10 text-center" style={{ backgroundColor: "#0D0D0D" }}>
+              <p className="text-xs font-body tracking-[0.25em] uppercase mb-4" style={{ color: "#444" }}>Победителей в этом году</p>
+              <p className="font-display font-semibold mb-2" style={{ fontSize: "clamp(32px,4vw,56px)", color: "#E8C96A", lineHeight: 1 }}>
+                {winnersCount > 0 ? animWinners : "—"}
+              </p>
+              <p className="text-xs font-body" style={{ color: "#444" }}>
+                {winnersCount > 0 ? `по ${fmt(PRIZE_PER_WINNER)} каждому` : `нужно ещё ${fmt(PRIZE_PER_WINNER - totalBank)}`}
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <Icon name="Users" size={14} style={{ color: "#C9A84C" }} />
-              <span className="text-sm font-body" style={{ color: "#C9A84C" }}>Равные шансы у каждого</span>
+          </div>
+
+          {/* Целевое использование — баннер */}
+          <div className="p-5 mb-2 flex flex-col md:flex-row items-start md:items-center gap-4" style={{ backgroundColor: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.15)", borderTop: "none" }}>
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <Icon name="Home" size={16} style={{ color: "#C9A84C" }} />
+              <span className="text-xs font-body tracking-widest uppercase font-semibold" style={{ color: "#C9A84C" }}>Целевое использование</span>
+            </div>
+            <p className="text-xs font-body leading-relaxed" style={{ color: "#666" }}>
+              Выигрыш расходуется <strong style={{ color: "#EDE8DF" }}>только на жильё</strong> — покупку квартиры, строительство дома или погашение ипотеки. Победитель подписывает соглашение о целевом использовании средств.
+            </p>
+          </div>
+
+          {/* Взнос */}
+          <div className="p-5 mb-8 flex flex-col md:flex-row items-center justify-between gap-4" style={{ backgroundColor: "#111", border: "1px solid #1A1A1A", borderTop: "none" }}>
+            <div className="flex items-center gap-3">
+              <Icon name="Info" size={14} style={{ color: "#8A6F30", flexShrink: 0 }} />
+              <p className="text-sm font-body" style={{ color: "#666" }}>
+                Взнос: <span style={{ color: "#EDE8DF" }}>12 000 ₽</span> единовременно или <span style={{ color: "#EDE8DF" }}>1 000 ₽/мес</span> до 15-го числа
+              </p>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <Icon name="Users" size={13} style={{ color: "#C9A84C" }} />
+              <span className="text-xs font-body" style={{ color: "#C9A84C" }}>Равный шанс у каждого участника</span>
             </div>
           </div>
 
@@ -246,7 +266,7 @@ export default function Index() {
             </div>
             <div className="mt-8 pt-8" style={{ borderTop: "1px solid #1A1A1A" }}>
               <p className="text-xs font-body" style={{ color: "#444" }}>
-                Розыгрыш: <span style={{ color: "#EDE8DF" }}>31 декабря 2026 в 20:00</span> · победитель определяется по случайному номеру договора
+                Розыгрыш: <span style={{ color: "#EDE8DF" }}>29 декабря 2026 в 20:00</span> · победители определяются по случайным номерам договоров · выигрыш только на жильё
               </p>
             </div>
           </div>
@@ -375,28 +395,44 @@ export default function Index() {
           {/* История розыгрышей */}
           <div className="mt-16">
             <h3 className="font-display text-3xl font-light mb-8 text-center">История розыгрышей</h3>
-            <div style={{ border: "1px solid #1A1A1A", overflow: "hidden" }}>
-              {DRAW_HISTORY.map((d, i) => (
-                <div
-                  key={d.year}
-                  className="grid px-6 py-6 items-center"
-                  style={{ gridTemplateColumns: "80px 2fr 2fr 2fr 1fr", borderBottom: i < DRAW_HISTORY.length - 1 ? "1px solid #111" : "none", backgroundColor: "#0D0D0D", transition: "background 0.2s" }}
-                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#111")}
-                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#0D0D0D")}
-                >
-                  <div className="font-display text-2xl" style={{ color: "#C9A84C" }}>{d.year}</div>
-                  <div>
-                    <p className="font-body text-sm" style={{ color: "#EDE8DF" }}>{d.winner}</p>
-                    <p className="font-body text-xs mt-0.5" style={{ color: "#444", fontFamily: "monospace" }}>{d.contract}</p>
+            <div className="space-y-3">
+              {DRAW_HISTORY.map((d) => (
+                <div key={d.year} style={{ border: "1px solid #1A1A1A", overflow: "hidden" }}>
+                  {/* Шапка года */}
+                  <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-4" style={{ backgroundColor: "#0A0A0A", borderBottom: "1px solid #1A1A1A" }}>
+                    <div className="flex items-center gap-5">
+                      <span className="font-display text-3xl font-semibold" style={{ color: "#C9A84C" }}>{d.year}</span>
+                      <div>
+                        <p className="font-body text-xs" style={{ color: "#555" }}>{d.participants} участников · {d.date}</p>
+                        <p className="font-body text-xs mt-0.5" style={{ color: "#555" }}>Банк: <span style={{ color: "#EDE8DF" }}>{fmt(d.totalBank)}</span></p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Icon name="Home" size={13} style={{ color: "#8A6F30" }} />
+                      <span className="text-xs font-body" style={{ color: "#666" }}>{d.winners.length} победителей · по {fmt(PRIZE_PER_WINNER)}</span>
+                      <span className="text-xs font-body px-2 py-1 ml-2" style={{ color: "#4CAF50", border: "1px solid rgba(76,175,80,0.2)", backgroundColor: "rgba(76,175,80,0.07)" }}>Выплачено</span>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-body text-sm font-medium" style={{ color: "#C9A84C" }}>{fmt(d.amount)}</p>
-                    <p className="font-body text-xs mt-0.5" style={{ color: "#444" }}>{d.participants} участников</p>
-                  </div>
-                  <div className="text-right font-body text-xs" style={{ color: "#444" }}>{d.date}</div>
-                  <div className="text-right">
-                    <span className="text-xs font-body px-2 py-1" style={{ color: "#4CAF50", border: "1px solid rgba(76,175,80,0.2)", backgroundColor: "rgba(76,175,80,0.07)" }}>Выплачено</span>
-                  </div>
+                  {/* Победители */}
+                  {d.winners.map((w, wi) => (
+                    <div key={w.contract} className="flex items-center justify-between px-6 py-4"
+                      style={{ borderBottom: wi < d.winners.length - 1 ? "1px solid #111" : "none", backgroundColor: "#0D0D0D", transition: "background 0.2s" }}
+                      onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#111")}
+                      onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#0D0D0D")}
+                    >
+                      <div className="flex items-center gap-4">
+                        <span className="text-xs font-body" style={{ color: "#333" }}>#{wi + 1}</span>
+                        <div>
+                          <p className="font-body text-sm" style={{ color: "#EDE8DF" }}>{w.name}</p>
+                          <p className="font-body text-xs mt-0.5" style={{ color: "#444", fontFamily: "monospace" }}>{w.contract}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Icon name="Home" size={12} style={{ color: "#8A6F30" }} />
+                        <span className="font-display text-lg font-semibold" style={{ color: "#C9A84C" }}>{fmt(w.prize)}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
@@ -674,9 +710,10 @@ export default function Index() {
                 ["1. Предмет договора", "Организатор проводит ежегодный совместный банк. Участник вносит фиксированный взнос и получает право на участие в розыгрыше."],
                 ["2. Условия участия", "Взнос составляет 12 000 ₽ единовременно или 1 000 ₽ ежемесячно до 15-го числа. Участие активно при условии своевременных платежей."],
                 ["3. Номер договора", "Каждому участнику присваивается уникальный номер в формате БНК-ГГГГ-NNN. Розыгрыш проводится по этим номерам случайным образом."],
-                ["4. Розыгрыш", "Проводится 31 декабря в 20:00. Победитель определяется генератором случайных чисел. Все участники имеют равный шанс — один договор, один шанс."],
-                ["5. Выплата", "Победитель получает 100% суммы банка в течение 3 рабочих дней на реквизиты, указанные в договоре. Факт выплаты публикуется на сайте."],
-                ["6. Прозрачность", "Все участники, номера договоров и суммы взносов публично отображаются на сайте в реальном времени. Организатор не может скрыть или изменить данные."],
+                ["4. Розыгрыш", "Проводится 29 декабря в 20:00. Банк делится на пакеты по 5 500 000 ₽. Сколько пакетов — столько победителей. Победители определяются случайным выбором номеров договоров. Каждый участник имеет равный шанс."],
+                ["5. Целевое использование", "Выигрыш расходуется исключительно на жильё: покупку квартиры, строительство или погашение ипотеки. Победитель подписывает соглашение о целевом использовании средств перед получением выплаты."],
+                ["6. Выплата", "Каждый победитель получает 5 500 000 ₽ в течение 3 рабочих дней на реквизиты из договора. Факт каждой выплаты публикуется на сайте."],
+                ["7. Прозрачность", "Все участники, номера договоров и суммы взносов публично отображаются на сайте в реальном времени. Организатор не может скрыть или изменить данные."],
               ].map(([title, text]) => (
                 <div key={title as string} className="mb-5">
                   <p className="font-semibold mb-2" style={{ color: "#EDE8DF" }}>{title}</p>
