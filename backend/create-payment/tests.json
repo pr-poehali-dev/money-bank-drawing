@@ -1,0 +1,11 @@
+{
+  "tests": [
+    {
+      "name": "Missing participant_id",
+      "method": "POST",
+      "path": "/",
+      "body": {},
+      "expectedStatus": 400
+    }
+  ]
+}

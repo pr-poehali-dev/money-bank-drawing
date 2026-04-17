@@ -1,0 +1,13 @@
+{
+  "tests": [
+    {
+      "name": "Ignored event type",
+      "method": "POST",
+      "path": "/",
+      "body": {"event": "payment.waiting_for_capture", "object": {}},
+      "expectedStatus": 200,
+      "bodyMatcher": "partial",
+      "expectedBody": {"status": "ignored"}
+    }
+  ]
+}

@@ -1,36 +1,52 @@
 import { useState, useEffect, useRef } from "react";
 import Icon from "@/components/ui/icon";
 
-const NEXT_DRAW_DATE = new Date("2026-12-31T20:00:00");
-const MONTHLY_FEE = 1000;
-const ANNUAL_FEE = 12000;
+const NEXT_DRAW_DATE = new Date("2026-12-29T20:00:00");
+const PRIZE_PER_WINNER = 5_500_000;
 
-const PARTICIPANTS = [
-  { id: 1, contract: "БНК-2026-001", name: "Александр М.", paid: 12000, type: "annual", date: "12.01.2026", status: "active" },
-  { id: 2, contract: "БНК-2026-002", name: "Екатерина В.", paid: 9000, type: "monthly", date: "15.01.2026", status: "active" },
-  { id: 3, contract: "БНК-2026-003", name: "Дмитрий К.", paid: 12000, type: "annual", date: "20.01.2026", status: "active" },
-  { id: 4, contract: "БНК-2026-004", name: "Ольга Н.", paid: 8000, type: "monthly", date: "25.01.2026", status: "active" },
-  { id: 5, contract: "БНК-2026-005", name: "Сергей П.", paid: 12000, type: "annual", date: "02.02.2026", status: "active" },
-  { id: 6, contract: "БНК-2026-006", name: "Мария Л.", paid: 7000, type: "monthly", date: "10.02.2026", status: "active" },
-  { id: 7, contract: "БНК-2026-007", name: "Иван Т.", paid: 12000, type: "annual", date: "14.02.2026", status: "active" },
-  { id: 8, contract: "БНК-2026-008", name: "Анна Ф.", paid: 5000, type: "monthly", date: "18.02.2026", status: "active" },
-  { id: 9, contract: "БНК-2026-009", name: "Павел Р.", paid: 12000, type: "annual", date: "01.03.2026", status: "active" },
-  { id: 10, contract: "БНК-2026-010", name: "Наталья С.", paid: 4000, type: "monthly", date: "05.03.2026", status: "active" },
-];
+const API = {
+  register: "https://functions.poehali.dev/e715922c-4dd5-442b-b25f-f764910aba54",
+  createPayment: "https://functions.poehali.dev/ecf98930-9e76-42cd-b3b7-d71085d4308d",
+  getStats: "https://functions.poehali.dev/6e1ec002-00e3-4360-b4ee-c8d74bf636a7",
+};
 
 const DRAW_HISTORY = [
-  { year: 2023, contract: "БНК-2023-014", winner: "Андрей С.", amount: 312000, date: "31.12.2023", participants: 26 },
-  { year: 2024, contract: "БНК-2024-031", winner: "Светлана Р.", amount: 444000, date: "31.12.2024", participants: 37 },
-  { year: 2025, contract: "БНК-2025-008", winner: "Михаил Д.", amount: 516000, date: "31.12.2025", participants: 43 },
+  {
+    year: 2023, date: "29.12.2023", totalBank: 11_000_000, participants: 920,
+    winners: [
+      { contract: "БНК-2023-047", name: "Андрей С.", prize: 5_500_000 },
+      { contract: "БНК-2023-312", name: "Светлана Р.", prize: 5_500_000 },
+    ],
+  },
+  {
+    year: 2024, date: "29.12.2024", totalBank: 16_500_000, participants: 1380,
+    winners: [
+      { contract: "БНК-2024-088", name: "Михаил Д.", prize: 5_500_000 },
+      { contract: "БНК-2024-501", name: "Ольга К.", prize: 5_500_000 },
+      { contract: "БНК-2024-219", name: "Виктор Н.", prize: 5_500_000 },
+    ],
+  },
+  {
+    year: 2025, date: "29.12.2025", totalBank: 22_000_000, participants: 1840,
+    winners: [
+      { contract: "БНК-2025-134", name: "Елена В.", prize: 5_500_000 },
+      { contract: "БНК-2025-677", name: "Артём Л.", prize: 5_500_000 },
+      { contract: "БНК-2025-903", name: "Марина Т.", prize: 5_500_000 },
+      { contract: "БНК-2025-022", name: "Денис Ф.", prize: 5_500_000 },
+    ],
+  },
 ];
 
 const RULES = [
-  { num: "01", title: "Договор оферты", text: "Каждый участник заключает договор оферты. Ему присваивается уникальный номер договора — именно по нему проводится розыгрыш." },
-  { num: "02", title: "Взнос", text: "Фиксированный взнос — 12 000 ₽ единовременно или 1 000 ₽ ежемесячно до 15-го числа каждого месяца. Участие подтверждается только после оплаты." },
-  { num: "03", title: "Прозрачность", text: "Все участники, номера договоров и суммы публично отображаются на сайте. Банк виден в реальном времени — никаких скрытых операций." },
-  { num: "04", title: "Розыгрыш", text: "31 декабря в 20:00 случайным образом выбирается один номер договора. Победитель получает 100% суммы банка. Каждый участник имеет равный шанс." },
-  { num: "05", title: "Выплата", text: "Победитель получает всю сумму банка в течение 3 рабочих дней. Выплата производится на реквизиты, указанные в договоре." },
+  { num: "01", title: "Договор оферты", text: "Каждый участник заключает договор оферты и получает уникальный номер. Именно по номерам договоров проводится розыгрыш — всё прозрачно и верифицировано." },
+  { num: "02", title: "Взнос", text: "Фиксированный взнос — 12 000 ₽ единовременно или 1 000 ₽ ежемесячно до 15-го числа. Участие активно только при своевременных платежах." },
+  { num: "03", title: "Несколько победителей", text: "Банк делится на пакеты по 5 500 000 ₽. Сколько пакетов накопилось — столько победителей определяется в розыгрыше 29 декабря." },
+  { num: "04", title: "Целевое использование", text: "Выигрыш можно потратить ТОЛЬКО на жильё: покупку квартиры, строительство дома или погашение ипотеки. Победитель подписывает соглашение о целевом использовании." },
+  { num: "05", title: "Выплата", text: "Каждый победитель получает 5 500 000 ₽ в течение 3 рабочих дней на реквизиты, указанные в договоре. Факт выплаты публикуется на сайте." },
 ];
+
+type Participant = { contract: string; name: string; pay_type: string; paid: number; date: string };
+type Stats = { total_bank: number; participants_count: number; winners_count: number; participants: Participant[] };
 
 function useCountUp(target: number, duration = 1500) {
   const [count, setCount] = useState(0);
@@ -92,16 +108,55 @@ function NavLink({ href, label }: { href: string; label: string }) {
 type FormData = { name: string; phone: string; email: string; payType: "annual" | "monthly"; agreed: boolean };
 
 export default function Index() {
-  const totalBank = PARTICIPANTS.reduce((s, p) => s + p.paid, 0);
-  const count = PARTICIPANTS.length;
-  const animBank = useCountUp(totalBank);
-  const animCount = useCountUp(count, 900);
-  const countdown = useCountdown(NEXT_DRAW_DATE);
-  const [modal, setModal] = useState<"join" | "offer" | null>(null);
+  const [stats, setStats] = useState<Stats>({ total_bank: 0, participants_count: 0, winners_count: 0, participants: [] });
+  const [submitting, setSubmitting] = useState(false);
+  const [regError, setRegError] = useState("");
+  const [modal, setModal] = useState<"join" | "offer" | "success" | null>(null);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormData>({ name: "", phone: "", email: "", payType: "annual", agreed: false });
 
-  const contractNum = `БНК-2026-0${String(count + 1).padStart(2, "0")}`;
+  useEffect(() => {
+    fetch(API.getStats).then(r => r.json()).then(d => setStats(d)).catch(() => {});
+    if (new URLSearchParams(window.location.search).get("payment") === "success") {
+      setModal("success");
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
+
+  const totalBank = stats.total_bank;
+  const count = stats.participants_count;
+  const winnersCount = stats.winners_count;
+  const participants = stats.participants;
+
+  const animBank = useCountUp(totalBank);
+  const animCount = useCountUp(count, 900);
+  const animWinners = useCountUp(winnersCount, 700);
+  const countdown = useCountdown(NEXT_DRAW_DATE);
+
+  const handleRegister = async () => {
+    setSubmitting(true);
+    setRegError("");
+    try {
+      const res = await fetch(API.register, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ full_name: form.name, phone: form.phone, email: form.email, pay_type: form.payType }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setRegError(data.error || "Ошибка регистрации"); setSubmitting(false); return; }
+      const payRes = await fetch(API.createPayment, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ participant_id: data.participant_id }),
+      });
+      const payData = await payRes.json();
+      if (!payRes.ok) { setRegError(payData.error || "Ошибка создания платежа"); setSubmitting(false); return; }
+      window.location.href = payData.payment_url;
+    } catch {
+      setRegError("Ошибка соединения. Попробуйте ещё раз.");
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0D0D0D", color: "#EDE8DF" }}>
@@ -293,13 +348,17 @@ export default function Index() {
               <div className="text-right">Статус</div>
             </div>
 
-            {PARTICIPANTS.map((p, i) => (
+            {participants.length === 0 ? (
+              <div className="py-16 text-center font-body text-sm" style={{ color: "#444" }}>
+                Пока нет активных участников. Стань первым!
+              </div>
+            ) : participants.map((p, i) => (
               <div
-                key={p.id}
+                key={p.contract}
                 className="grid px-6 py-5 items-center"
                 style={{
                   gridTemplateColumns: "2fr 3fr 2fr 2fr 1fr",
-                  borderBottom: i < PARTICIPANTS.length - 1 ? "1px solid #111" : "none",
+                  borderBottom: i < participants.length - 1 ? "1px solid #111" : "none",
                   backgroundColor: "#0D0D0D",
                   transition: "background 0.2s",
                 }}
@@ -310,12 +369,10 @@ export default function Index() {
                 <div className="font-body text-sm" style={{ color: "#EDE8DF" }}>{p.name}</div>
                 <div className="text-right font-body text-sm font-medium" style={{ color: "#EDE8DF" }}>{fmt(p.paid)}</div>
                 <div className="text-right font-body text-xs" style={{ color: "#555" }}>
-                  {p.type === "annual" ? "Единовременно" : "Ежемесячно"}
+                  {p.pay_type === "annual" ? "Единовременно" : "Ежемесячно"}
                 </div>
                 <div className="text-right">
-                  <span className="text-xs font-body px-2 py-0.5" style={{ backgroundColor: "rgba(76,175,80,0.1)", color: "#4CAF50", border: "1px solid rgba(76,175,80,0.2)" }}>
-                    ✓
-                  </span>
+                  <span className="text-xs font-body px-2 py-0.5" style={{ backgroundColor: "rgba(76,175,80,0.1)", color: "#4CAF50", border: "1px solid rgba(76,175,80,0.2)" }}>✓</span>
                 </div>
               </div>
             ))}
@@ -530,7 +587,7 @@ export default function Index() {
             </div>
             <span className="font-display tracking-widest" style={{ color: "#C9A84C" }}>БАНК</span>
           </div>
-          <p className="text-xs font-body" style={{ color: "#2A2A2A" }}>Розыгрыш 31 декабря 2026 · Договор публичной оферты</p>
+          <p className="text-xs font-body" style={{ color: "#2A2A2A" }}>Розыгрыш 29 декабря 2026 · Договор публичной оферты</p>
           <div className="flex gap-6">
             <NavLink href="#rules" label="Правила" />
             <NavLink href="#contacts" label="Контакты" />
@@ -674,18 +731,58 @@ export default function Index() {
                     </p>
                   </div>
 
+                  {regError && (
+                    <div className="mb-4 px-4 py-3 text-xs font-body" style={{ backgroundColor: "rgba(220,50,50,0.08)", border: "1px solid rgba(220,50,50,0.2)", color: "#E57373" }}>
+                      {regError}
+                    </div>
+                  )}
+
                   <div className="flex gap-3">
                     <button onClick={() => setStep(2)} className="flex-1 py-4 text-sm font-body tracking-widest uppercase" style={{ border: "1px solid #2A2A2A", color: "#666" }}>Назад</button>
                     <button
-                      disabled={!form.agreed}
+                      onClick={handleRegister}
+                      disabled={!form.agreed || submitting}
                       className="flex-1 py-4 text-sm font-body tracking-widest uppercase transition-opacity"
-                      style={{ backgroundColor: "#C9A84C", color: "#0D0D0D", fontWeight: 600, opacity: form.agreed ? 1 : 0.4 }}
+                      style={{ backgroundColor: "#C9A84C", color: "#0D0D0D", fontWeight: 600, opacity: (form.agreed && !submitting) ? 1 : 0.4 }}
                     >
-                      Перейти к оплате
+                      {submitting ? "Подождите..." : "Перейти к оплате"}
                     </button>
                   </div>
                 </>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: УСПЕХ */}
+      {modal === "success" && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 24, backgroundColor: "rgba(0,0,0,0.88)", backdropFilter: "blur(10px)" }}>
+          <div style={{ width: "100%", maxWidth: 420, backgroundColor: "#0D0D0D", border: "1px solid #2A2A2A", position: "relative", textAlign: "center" }}>
+            <button onClick={() => setModal(null)} style={{ position: "absolute", top: 20, right: 20, color: "#444", background: "none", border: "none", cursor: "pointer" }}>
+              <Icon name="X" size={18} />
+            </button>
+            <div className="px-8 py-10">
+              <div style={{ width: 56, height: 56, borderRadius: "50%", backgroundColor: "rgba(76,175,80,0.1)", border: "1px solid rgba(76,175,80,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
+                <Icon name="CheckCircle" size={26} style={{ color: "#4CAF50" }} />
+              </div>
+              <h3 className="font-display text-3xl font-light mb-3">Оплата прошла!</h3>
+              <p className="font-body text-sm mb-6" style={{ color: "#666" }}>
+                Вы стали участником банка. Ваш номер договора появится в списке участников на сайте в течение нескольких минут.
+              </p>
+              <div className="p-4 mb-6" style={{ backgroundColor: "#080808", border: "1px solid #1A1A1A" }}>
+                <div className="flex items-center justify-center gap-2">
+                  <Icon name="Home" size={14} style={{ color: "#8A6F30" }} />
+                  <p className="text-xs font-body" style={{ color: "#666" }}>Помните: выигрыш расходуется только на жильё</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setModal(null)}
+                className="w-full py-4 text-sm font-body tracking-widest uppercase"
+                style={{ backgroundColor: "#C9A84C", color: "#0D0D0D", fontWeight: 600 }}
+              >
+                Отлично!
+              </button>
             </div>
           </div>
         </div>

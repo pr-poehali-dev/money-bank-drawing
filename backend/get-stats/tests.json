@@ -1,0 +1,12 @@
+{
+  "tests": [
+    {
+      "name": "Get stats",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "bodyMatcher": "partial",
+      "expectedBody": {"total_bank": 0, "participants_count": 0}
+    }
+  ]
+}
